@@ -1,0 +1,26 @@
+name: Unzip project
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unzip
+        run: |
+          unzip -q buildx-course-fixed.zip -d _tmp
+          rm -rf _tmp/__MACOSX
+          if [ "$(ls -A _tmp | wc -l)" = "1" ] && [ -d "_tmp/$(ls _tmp)" ]; then
+            cp -a "_tmp/$(ls _tmp)/." .
+          else
+            cp -a _tmp/. .
+          fi
+          rm -rf _tmp buildx-course-fixed.zip
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Unzip project"
+          git push
